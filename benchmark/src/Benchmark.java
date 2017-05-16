@@ -38,6 +38,39 @@ public class Benchmark {
 			}
 		});
 
+		benchmark("left shift", new Task() {
+			@Override
+			public int run() {
+				int m = 0x12345678;
+				for (int n = 0; n < 1000000; n++) {
+					m += (m << n) + (m << -n);
+				}
+				return m;
+			}
+		});
+
+		benchmark("right shift", new Task() {
+			@Override
+			public int run() {
+				int m = 0x12345678;
+				for (int n = 0; n < 1000000; n++) {
+					m += (m >> n) + (m >> -n);
+				}
+				return m;
+			}
+		});
+
+		benchmark("right unsigned shift", new Task() {
+			@Override
+			public int run() {
+				int m = 0x12345678;
+				for (int n = 0; n < 1000000; n++) {
+					m += (m >>> n) + (m >>> -n);
+				}
+				return m;
+			}
+		});
+
 		benchmark("call static mult", new Task() {
 			@Override
 			public int run() {
@@ -112,6 +145,19 @@ public class Benchmark {
 					case 0: return new Test1();
 					default: return new Test2();
 				}
+			}
+		});
+
+		final int[] srcI = new int[16 * 1024];
+		final int[] dstI = new int[16 * 1024];
+
+		benchmark("arraycopy int", new Task() {
+			@Override
+			public int run() {
+				for (int n = 0; n < 1024; n++) {
+					System.arraycopy(srcI, 0, dstI, n, 8 * 1024);
+				}
+				return 0;
 			}
 		});
 
@@ -460,7 +506,8 @@ public class Benchmark {
 			//System.out.println((double)(t3 - t2) / 1000000.0);
 			System.out.println((double)(t3 - t2) / 1000000.0);
 		} catch (Throwable t) {
-			System.out.println(t.getMessage());
+			System.out.println("ERROR");
+			//System.out.println(t.getMessage());
 		}
 
 	}
