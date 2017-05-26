@@ -1,7 +1,9 @@
+import com.jtransc.FastMemory;
 import com.jtransc.simd.Float32x4;
 import com.jtransc.simd.MutableFloat32x4;
 import com.jtransc.simd.MutableMatrixFloat32x4x4;
 
+import java.nio.*;
 import java.util.Random;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
@@ -411,6 +413,79 @@ public class Benchmark {
                     sb.append("orld");
                 }
                 return sb.toString().length();
+            }
+        });
+
+        benchmark("Non Direct Buffer", new Task() {
+            @Override
+            public int run() {
+                ByteBuffer bb = ByteBuffer.allocate(1024).order(ByteOrder.nativeOrder());
+                IntBuffer ib = bb.asIntBuffer();
+                FloatBuffer fb = bb.asFloatBuffer();
+                int res = 0;
+                for (int n = 0; n < 100000; n++) {
+                    fb.put(0, (float)n);
+                    res += ib.get(0);
+                }
+                return res;
+            }
+        });
+
+        benchmark("Direct Buffer Int/float", new Task() {
+            @Override
+            public int run() {
+                ByteBuffer bb = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+                IntBuffer ib = bb.asIntBuffer();
+                FloatBuffer fb = bb.asFloatBuffer();
+                int res = 0;
+                for (int n = 0; n < 100000; n++) {
+                    fb.put(0, (float)n);
+                    res += ib.get(0);
+                }
+                return res;
+            }
+        });
+
+        benchmark("Direct Buffer Short/Char", new Task() {
+            @Override
+            public int run() {
+                ByteBuffer bb = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+                ShortBuffer sb = bb.asShortBuffer();
+                CharBuffer cb = bb.asCharBuffer();
+                int res = 0;
+                for (int n = 0; n < 100000; n++) {
+                    cb.put(0, (char)n);
+                    res += sb.get(0);
+                }
+                return res;
+            }
+        });
+
+        benchmark("Direct Buffer Double/Long", new Task() {
+            @Override
+            public int run() {
+                ByteBuffer bb = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+                LongBuffer sb = bb.asLongBuffer();
+                DoubleBuffer cb = bb.asDoubleBuffer();
+                int res = 0;
+                for (int n = 0; n < 100000; n++) {
+                    cb.put(0, (double)n);
+                    res += sb.get(0);
+                }
+                return res;
+            }
+        });
+
+        benchmark("FastMemory", new Task() {
+            @Override
+            public int run() {
+                FastMemory mem = FastMemory.alloc(1024);
+                int res = 0;
+                for (int n = 0; n < 100000; n++) {
+                    mem.setAlignedFloat32(0, (float)n);
+                    res += mem.getAlignedInt32(0);
+                }
+                return res;
             }
         });
 
