@@ -1,4 +1,6 @@
 import com.jtransc.FastMemory;
+import com.jtransc.JTranscSystem;
+import com.jtransc.io.JTranscConsole;
 import com.jtransc.simd.Float32x4;
 import com.jtransc.simd.MutableFloat32x4;
 import com.jtransc.simd.MutableMatrixFloat32x4x4;
@@ -230,69 +232,70 @@ public class Benchmark {
             }
         });
 
+        final byte[] barray = new byte[1000000];
+        final short[] sarray = new short[1000000];
+        final char[] carray = new char[1000000];
+        final int[] iarray = new int[1000000];
+        final float[] farray = new float[1000000];
+        final double[] darray = new double[1000000];
+
         benchmark("write byte[]", new Task() {
             @Override
             public int run() {
-                byte[] array = new byte[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = (byte) (n * 1000);
+                    barray[n] = (byte) (n * 123456711);
                 }
-                return (int) array[7];
+                return (int) barray[7];
             }
         });
 
         benchmark("write short[]", new Task() {
             @Override
             public int run() {
-                short[] array = new short[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = (short) (n * 1000);
+                    sarray[n] = (short) (n * 1000);
                 }
-                return (int) array[7];
+                return (int) sarray[7];
             }
         });
 
         benchmark("write char[]", new Task() {
             @Override
             public int run() {
-                char[] array = new char[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = (char) (n * 1000);
+                    carray[n] = (char) (n * 1000);
                 }
-                return (int) array[7];
+                return (int) carray[7];
             }
         });
 
         benchmark("write int[]", new Task() {
             @Override
             public int run() {
-                int[] array = new int[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = n * 1000;
+                    iarray[n] = n * 1000;
                 }
-                return (int) array[7];
+                return (int) iarray[7];
             }
         });
 
         benchmark("write float[]", new Task() {
             @Override
             public int run() {
-                float[] array = new float[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = n * 1000;
+                    farray[n] = n * 1000;
                 }
-                return (int) array[7];
+                return (int) farray[7];
             }
         });
 
         benchmark("write double[]", new Task() {
             @Override
             public int run() {
-                double[] array = new double[1000000];
                 for (int n = 0; n < 1000000; n++) {
-                    array[n] = n * 1000;
+                    darray[n] = n * 1000;
                 }
-                return (int) array[7];
+                return (int) darray[7];
             }
         });
 
@@ -489,7 +492,7 @@ public class Benchmark {
             }
         });
 
-        benchmark("Create Instances1", new Task() {
+        benchmark("Create Instances1 local", new Task() {
             @Override
             public int run() {
                 int out = 0;
@@ -503,7 +506,7 @@ public class Benchmark {
 
         System.gc();
 
-        benchmark("Create Instances2", new Task() {
+        benchmark("Create Instances2 local", new Task() {
             @Override
             public int run() {
                 int out = 0;
@@ -511,6 +514,22 @@ public class Benchmark {
                 for (int n = 0; n < 100000; n++) {
                     MyClass2 myClass = new MyClass2(s, n * out);
                     out += myClass.b;
+                }
+                return out;
+            }
+        });
+
+        MyClass2[] objects = new MyClass2[100000];
+
+        benchmark("Create Instances2 global", new Task() {
+            @Override
+            public int run() {
+                int out = 0;
+                String s = "test";
+                for (int n = 0; n < 100000; n++) {
+                    MyClass2 v = new MyClass2(s, n * out);
+                    objects[n] = v;
+                    out += v.b;
                 }
                 return out;
             }
@@ -664,6 +683,8 @@ public class Benchmark {
             }
         });
 
+        System.out.println("TOTAL time: " + totalTime);
+
         //try {
         //    throw new Throwable();
         //} catch (Throwable e) {
@@ -672,21 +693,28 @@ public class Benchmark {
         //new Throwable().printStackTrace();
     }
 
+    static private double totalTime = 0.0;
+
     static private void benchmark(String name, Task run) {
         System.out.print(name + "...");
+        System.out.flush();
 
         try {
-            long t1 = System.nanoTime();
+            double t1 = JTranscSystem.stamp();
             for (int n = 0; n < 10; n++) run.run(); // warming up
-            long t2 = System.nanoTime();
+            System.gc();
+            double t2 = JTranscSystem.stamp();
             for (int n = 0; n < 10; n++) run.run();
-            long t3 = System.nanoTime();
+            double t3 = JTranscSystem.stamp();
             //System.out.println("( " + (t2 - t1) + " ) :: ( " + (t3 - t2) + " )");
 
             //System.out.println((double)(t3 - t2) / 1000000.0);
-            System.out.println((double) (t3 - t2) / 1000000.0);
+
+            double elapsedTime = JTranscSystem.elapsedTime(t2, t3);
+            System.out.println(elapsedTime);
+            totalTime += elapsedTime;
         } catch (Throwable t) {
-            System.out.println("ERROR");
+            JTranscConsole.log("ERROR");
             //System.out.println(t.getMessage());
         }
 
