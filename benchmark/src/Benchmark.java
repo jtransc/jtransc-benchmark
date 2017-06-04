@@ -34,7 +34,7 @@ public class Benchmark {
             @Override
             public int run() {
                 int m = 0;
-                for (int n = 0; n < 1000000; n++) {
+                for (int n = 0; n < 1_000_000; n++) {
                     m += n;
                 }
                 return m;
