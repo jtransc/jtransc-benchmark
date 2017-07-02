@@ -6,6 +6,7 @@ import com.jtransc.simd.MutableFloat32x4;
 import com.jtransc.simd.MutableMatrixFloat32x4x4;
 
 import java.nio.*;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
@@ -219,71 +220,193 @@ public class Benchmark {
             }
         });
 
-        final byte[] srcB = new byte[16 * 1024];
-        final byte[] dstB = new byte[16 * 1024];
-        for (int n = 0; n < srcB.length; n++) srcB[n] = (byte) (n * 104729);
+        final int arraysLength = 16 * 1024;
+        final int copyLength = 8 * 1024;
+        final int prime = 104729;
+
+        final byte[] srcB = new byte[arraysLength];
+        final byte[] dstB = new byte[arraysLength];
+        for (int n = 0; n < srcB.length; n++) srcB[n] = (byte) (n * prime);
+
+        final short[] srcS = new short[arraysLength];
+        final short[] dstS = new short[arraysLength];
+        for (int n = 0; n < srcS.length; n++) srcS[n] = (short) (n * prime);
+
+        final char[] srcC = new char[arraysLength];
+        final char[] dstC = new char[arraysLength];
+        for (int n = 0; n < srcC.length; n++) srcC[n] = (char) (n * prime);
+
+        final int[] srcI = new int[arraysLength];
+        final int[] dstI = new int[arraysLength];
+        for (int n = 0; n < srcI.length; n++) srcI[n] = n * prime;
+
+        final float[] srcF = new float[arraysLength];
+        final float[] dstF = new float[arraysLength];
+        for (int n = 0; n < srcF.length; n++) srcF[n] = n * prime;
+
+        final double[] srcD = new double[arraysLength];
+        final double[] dstD = new double[arraysLength];
+        for (int n = 0; n < srcD.length; n++) srcD[n] = n * prime;
+
+        final long[] srcJ = new long[arraysLength];
+        final long[] dstJ = new long[arraysLength];
+        for (int n = 0; n < srcJ.length; n++) srcJ[n] = n * prime;
+
+        final Object[] srcO = new Object[arraysLength];
+        final Object[] dstO = new Object[arraysLength];
+        for (int n = 0; n < srcJ.length; n++) srcO[n] = null;
 
         benchmark("arraycopy byte", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
-                    System.arraycopy(srcB, 0, dstB, n, 8 * 1024);
+                    System.arraycopy(srcB, 0, dstB, n, copyLength);
                 }
                 return 0;
             }
         });
 
-        final short[] srcS = new short[16 * 1024];
-        final short[] dstS = new short[16 * 1024];
-        for (int n = 0; n < srcS.length; n++) srcS[n] = (short) (n * 104729);
 
         benchmark("arraycopy short", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
-                    System.arraycopy(srcS, 0, dstS, n, 8 * 1024);
+                    System.arraycopy(srcS, 0, dstS, n, copyLength);
                 }
                 return 0;
             }
         });
 
-        final char[] srcC = new char[16 * 1024];
-        final char[] dstC = new char[16 * 1024];
-        for (int n = 0; n < srcC.length; n++) srcC[n] = (char) (n * 104729);
 
         benchmark("arraycopy char", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
-                    System.arraycopy(srcC, 0, dstC, n, 8 * 1024);
+                    System.arraycopy(srcC, 0, dstC, n, copyLength);
                 }
                 return 0;
             }
         });
 
-        final int[] srcI = new int[16 * 1024];
-        final int[] dstI = new int[16 * 1024];
-        for (int n = 0; n < srcI.length; n++) srcI[n] = n * 104729;
 
         benchmark("arraycopy int", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
-                    System.arraycopy(srcI, 0, dstI, n, 8 * 1024);
+                    System.arraycopy(srcI, 0, dstI, n, copyLength);
                 }
                 return 0;
             }
         });
 
-        final float[] srcF = new float[16 * 1024];
-        final float[] dstF = new float[16 * 1024];
-        for (int n = 0; n < srcF.length; n++) srcF[n] = n * 104729;
 
         benchmark("arraycopy float", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
-                    System.arraycopy(srcF, 0, dstF, n, 8 * 1024);
+                    System.arraycopy(srcF, 0, dstF, n, copyLength);
+                }
+                return 0;
+            }
+        });
+
+
+        benchmark("arraycopy double", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcD, 0, dstD, n, copyLength);
+                }
+                return 0;
+            }
+        });
+
+
+        benchmark("arraycopy long", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcJ, 0, dstJ, n, copyLength);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill byte", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstB, n, n + copyLength, (byte)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill short", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstS, n, n + copyLength, (short)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill char", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstC, n, n + copyLength, (char)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill int", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstI, n, n + copyLength, (int)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill float", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstF, n, n + copyLength, (float)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill double", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstD, n, n + copyLength, (double)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill long", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstJ, n, n + copyLength, (long)n);
+                }
+                return 0;
+            }
+        });
+
+        benchmark("arrayfill object", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    Arrays.fill(dstO, n, n + copyLength, null);
                 }
                 return 0;
             }
