@@ -219,14 +219,71 @@ public class Benchmark {
             }
         });
 
+        final byte[] srcB = new byte[16 * 1024];
+        final byte[] dstB = new byte[16 * 1024];
+        for (int n = 0; n < srcB.length; n++) srcB[n] = (byte) (n * 104729);
+
+        benchmark("arraycopy byte", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcB, 0, dstB, n, 8 * 1024);
+                }
+                return 0;
+            }
+        });
+
+        final short[] srcS = new short[16 * 1024];
+        final short[] dstS = new short[16 * 1024];
+        for (int n = 0; n < srcS.length; n++) srcS[n] = (short) (n * 104729);
+
+        benchmark("arraycopy short", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcS, 0, dstS, n, 8 * 1024);
+                }
+                return 0;
+            }
+        });
+
+        final char[] srcC = new char[16 * 1024];
+        final char[] dstC = new char[16 * 1024];
+        for (int n = 0; n < srcC.length; n++) srcC[n] = (char) (n * 104729);
+
+        benchmark("arraycopy char", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcC, 0, dstC, n, 8 * 1024);
+                }
+                return 0;
+            }
+        });
+
         final int[] srcI = new int[16 * 1024];
         final int[] dstI = new int[16 * 1024];
+        for (int n = 0; n < srcI.length; n++) srcI[n] = n * 104729;
 
         benchmark("arraycopy int", new Task() {
             @Override
             public int run() {
                 for (int n = 0; n < 1024; n++) {
                     System.arraycopy(srcI, 0, dstI, n, 8 * 1024);
+                }
+                return 0;
+            }
+        });
+
+        final float[] srcF = new float[16 * 1024];
+        final float[] dstF = new float[16 * 1024];
+        for (int n = 0; n < srcF.length; n++) srcF[n] = n * 104729;
+
+        benchmark("arraycopy float", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcF, 0, dstF, n, 8 * 1024);
                 }
                 return 0;
             }
