@@ -3,3 +3,5 @@
 build
 program.exe
 program.obj
+/out.txt
+/err.txt
