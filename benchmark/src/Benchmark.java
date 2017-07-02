@@ -332,6 +332,16 @@ public class Benchmark {
             }
         });
 
+        benchmark("arraycopy object", new Task() {
+            @Override
+            public int run() {
+                for (int n = 0; n < 1024; n++) {
+                    System.arraycopy(srcO, 0, dstO, n, copyLength);
+                }
+                return 0;
+            }
+        });
+
         benchmark("arrayfill byte", new Task() {
             @Override
             public int run() {
